@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -184,12 +185,10 @@ namespace List
             Data = data;
         }
     }
-    class LinkedList<T>
+    class LinkedList<T>:IEnumerable<T>
     {   
-
         private Node<T> _first;
-        private Node<T> _last;
-        private int Count;
+        private Node<T> _last;       
 
         public void Add(T item)
         {
@@ -201,14 +200,53 @@ namespace List
             {
                 _last.Next = node;
                 node.Previous = _last;
-            }
-                
-
-            _last = node;
-            Count++;
+            }               
+            _last = node;          
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new MyLinkedListEnumerator<T>(_first);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
     }
+
+    class MyLinkedListEnumerator<T> : IEnumerator<T>
+    {
+        
+        private Node<T> first;
+        private Node<T> currentNode;
+
+        public MyLinkedListEnumerator(Node<T> fisrt)
+        {
+            first = fisrt;
+        }
+
+        public T Current => currentNode.Data;
+
+        object IEnumerator.Current => throw new NotImplementedException();
+
+        public void Dispose()
+        { }
+
+        public bool MoveNext()
+        {
+            if (currentNode == null)
+                currentNode = first;
+            else
+            {
+                currentNode = currentNode.Next;
+            }
+            return currentNode != null;
+        }
+        public void Reset()
+        { }
+    }
+
     class Program
     {
         public static void WriteAdd(Person item)
@@ -235,6 +273,11 @@ namespace List
             linkedList.Add(123);
 
 
+            foreach(var i in MyEnumerableExtensions.Take(MyEnumerableExtensions.Skip(linkedList,2),3))
+            {
+                Console.WriteLine(i);
+
+            }
         }
     }
 }
